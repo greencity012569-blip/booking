@@ -479,7 +479,7 @@ body { font-family: 'Sarabun', sans-serif; background: #F0F4F0; color: var(--tex
         </table>
       </div>
       <div style="margin-top:12px;text-align:right;">
-        <button class="btn btn-danger btn-sm" onclick="clearAllRegistrations()">🗑️ ล้างข้อมูลทั้งหมด</button>
+        <button class="btn btn-danger btn-sm" onclick="resetAllData()">🗑️ ล้าง + รีเซ็ตทั้งหมด</button>
       </div>
     </div>
 
@@ -902,10 +902,27 @@ async function renderRegistrations() {
     tbody.appendChild(tr);
   });
 }
-function clearAllRegistrations() {
-  alert('เวอร์ชัน Google Sheets ไม่ล้างข้อมูลจากหน้าเว็บ เพื่อกันข้อมูลหาย ให้ลบ/สำรองใน Google Sheets โดยตรง');
-}
+async function clearAllRegistrations() {
+  if (!confirm('ต้องการลบข้อมูลทั้งหมด และรีเซ็ต Slot ใช่ไหม?')) return;
 
+  try {
+    const res = await api('resetAll');
+
+    if (!res.success) {
+      alert(res.message || 'รีเซ็ตไม่สำเร็จ');
+      return;
+    }
+
+    alert('✅ รีเซ็ตข้อมูลทั้งหมดสำเร็จ');
+
+    await loadSlots();
+    await loadAdminSlots();
+    await renderRegistrations();
+
+  } catch (err) {
+    alert(err.message);
+  }
+}
 function renderSettings() {
   document.getElementById('orgTypeOptions').value = DB.get('orgTypes', []).join('\n');
   document.getElementById('prefixOptions').value = DB.get('prefixes', []).join('\n');
