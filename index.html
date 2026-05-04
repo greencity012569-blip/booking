@@ -750,14 +750,24 @@ document.getElementById('regForm').addEventListener('submit', async (e) => {
   };
 
   try {
-    const res = await api('book', { payload: JSON.stringify(data) });
-    if (!res.success) {
-      alert(res.message || 'บันทึกไม่สำเร็จ');
-      await loadSlots();
-      btn.disabled = false;
-      btn.innerHTML = 'ยืนยันการนัดหมาย';
-      return;
-    }
+   const res = await api('book', { payload: JSON.stringify(data) });
+
+console.log('BOOK RESPONSE:', res);
+
+const isSuccess =
+  res.success === true ||
+  res.status === 'success' ||
+  res.result === 'success' ||
+  res.message === 'บันทึกสำเร็จ' ||
+  res.message === 'ลงทะเบียนสำเร็จ';
+
+if (!isSuccess) {
+  alert(res.message || 'บันทึกไม่สำเร็จ');
+  await loadSlots();
+  btn.disabled = false;
+  btn.innerHTML = 'ยืนยันการนัดหมาย';
+  return;
+}
     document.getElementById('regForm').style.display = 'none';
     document.getElementById('successScreen').style.display = 'block';
     document.getElementById('successDetail').innerHTML = `
