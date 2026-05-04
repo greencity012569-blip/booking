@@ -1,0 +1,930 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>การนัดหมายการประเมินเมืองสิ่งแวดล้อมยั่งยืน</title>
+<link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700&family=Noto+Serif+Thai:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --green-dark: #1B5E20;
+  --green-mid: #2E7D32;
+  --green-light: #4CAF50;
+  --green-pale: #E8F5E9;
+  --green-accent: #A5D6A7;
+  --gold: #F9A825;
+  --gold-light: #FFF8E1;
+  --white: #FFFFFF;
+  --grey-bg: #F5F5F5;
+  --grey: #9E9E9E;
+  --text: #212121;
+  --text-light: #616161;
+  --red: #C62828;
+  --red-light: #FFEBEE;
+  --blue: #1565C0;
+  --blue-light: #E3F2FD;
+  --shadow: 0 4px 20px rgba(0,0,0,0.08);
+  --shadow-hover: 0 8px 32px rgba(27,94,32,0.15);
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: 'Sarabun', sans-serif; background: #F0F4F0; color: var(--text); min-height: 100vh; }
+
+/* ── PAGE SWITCHER ── */
+.page { display: none; }
+.page.active { display: block; }
+
+/* ── HEADER ── */
+.header {
+  background: linear-gradient(135deg, var(--green-dark) 0%, var(--green-mid) 100%);
+  padding: 24px 20px 20px;
+  text-align: center;
+  position: relative;
+}
+.header-badge {
+  display: inline-block;
+  background: rgba(255,255,255,0.15);
+  border: 1px solid rgba(255,255,255,0.3);
+  color: #fff; font-size: 11px;
+  padding: 3px 12px; border-radius: 20px;
+  margin-bottom: 10px; letter-spacing: 1px;
+}
+.header h1 {
+  font-family: 'Noto Serif Thai', serif;
+  color: #fff; font-size: clamp(15px, 3.5vw, 20px);
+  font-weight: 700; line-height: 1.5;
+  max-width: 600px; margin: 0 auto 6px;
+}
+.header p { color: rgba(255,255,255,0.75); font-size: 13px; }
+.admin-btn {
+  position: absolute; top: 16px; right: 16px;
+  background: rgba(255,255,255,0.15);
+  border: 1px solid rgba(255,255,255,0.3);
+  color: #fff; font-size: 12px; font-family: 'Sarabun', sans-serif;
+  padding: 6px 12px; border-radius: 8px; cursor: pointer;
+  transition: all 0.2s;
+}
+.admin-btn:hover { background: rgba(255,255,255,0.25); }
+
+/* ── CONTAINER ── */
+.container { max-width: 680px; margin: 0 auto; padding: 20px 16px 48px; }
+
+/* ── CARD ── */
+.card {
+  background: var(--white); border-radius: 16px;
+  box-shadow: var(--shadow); padding: 24px 20px; margin-bottom: 14px;
+}
+.card-title {
+  font-size: 15px; font-weight: 700; color: var(--green-dark);
+  margin-bottom: 18px; padding-bottom: 12px;
+  border-bottom: 2px solid var(--green-pale);
+  display: flex; align-items: center; gap: 8px;
+}
+.card-title .icon {
+  width: 28px; height: 28px; background: var(--green-pale);
+  border-radius: 50%; display: flex; align-items: center;
+  justify-content: center; font-size: 14px;
+}
+
+/* ── FORM ── */
+.field { margin-bottom: 16px; }
+.field:last-child { margin-bottom: 0; }
+.field label { display: block; font-size: 13px; font-weight: 600; color: var(--text); margin-bottom: 6px; }
+.field label .req { color: var(--red); margin-left: 2px; }
+.field input, .field select, .field textarea {
+  width: 100%; padding: 11px 13px;
+  border: 1.5px solid #E0E0E0; border-radius: 10px;
+  font-family: 'Sarabun', sans-serif; font-size: 15px;
+  color: var(--text); background: var(--white);
+  transition: all 0.2s; outline: none;
+  appearance: none; -webkit-appearance: none;
+}
+.field select {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%232E7D32' stroke-width='2' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat; background-position: right 13px center;
+  padding-right: 36px; cursor: pointer;
+}
+.field input:focus, .field select:focus { border-color: var(--green-light); box-shadow: 0 0 0 3px rgba(76,175,80,0.1); }
+.field input.err, .field select.err { border-color: var(--red); }
+.err-msg { color: var(--red); font-size: 12px; margin-top: 4px; display: none; }
+.has-error .err-msg { display: block; }
+.field-row { display: grid; grid-template-columns: 120px 1fr; gap: 12px; }
+@media(max-width:480px){ .field-row { grid-template-columns: 1fr; } }
+
+/* ── SLOTS ── */
+.slot-grid { display: grid; gap: 10px; }
+.slot-item {
+  border: 2px solid #E0E0E0; border-radius: 12px;
+  padding: 13px 15px; cursor: pointer;
+  transition: all 0.2s; display: flex; align-items: center; gap: 12px;
+}
+.slot-item:not(.taken):hover { border-color: var(--green-light); background: var(--green-pale); transform: translateY(-1px); box-shadow: var(--shadow-hover); }
+.slot-item.selected { border-color: var(--green-mid); background: var(--green-pale); box-shadow: 0 0 0 3px rgba(46,125,50,0.1); }
+.slot-item.taken { opacity: 0.45; cursor: not-allowed; background: var(--grey-bg); }
+.slot-radio {
+  width: 20px; height: 20px; border: 2px solid #BDBDBD;
+  border-radius: 50%; flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center; transition: all 0.2s;
+}
+.slot-item.selected .slot-radio { border-color: var(--green-mid); background: var(--green-mid); }
+.slot-item.selected .slot-radio::after { content:''; width:8px; height:8px; background:#fff; border-radius:50%; }
+.slot-info { flex: 1; }
+.slot-name { font-size: 14px; font-weight: 600; color: var(--text); margin-bottom: 2px; }
+.slot-time { font-size: 12px; color: var(--text-light); }
+.slot-badge { font-size: 11px; padding: 3px 10px; border-radius: 20px; font-weight: 600; white-space: nowrap; }
+.slot-badge.available { background: #E8F5E9; color: var(--green-mid); }
+.slot-badge.taken-badge { background: var(--red-light); color: var(--red); }
+
+/* ── BUTTON ── */
+.btn {
+  padding: 12px 20px; border: none; border-radius: 10px;
+  font-family: 'Sarabun', sans-serif; font-size: 15px;
+  font-weight: 600; cursor: pointer; transition: all 0.2s; display: inline-flex;
+  align-items: center; gap: 6px;
+}
+.btn-primary {
+  background: linear-gradient(135deg, var(--green-mid), var(--green-dark));
+  color: white; width: 100%; justify-content: center;
+  padding: 15px; font-size: 16px; border-radius: 12px;
+}
+.btn-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(27,94,32,0.3); }
+.btn-primary:disabled { opacity: 0.6; cursor: not-allowed; transform: none; box-shadow: none; }
+.btn-danger { background: var(--red-light); color: var(--red); padding: 7px 14px; font-size: 13px; }
+.btn-danger:hover { background: var(--red); color: white; }
+.btn-success { background: var(--green-pale); color: var(--green-dark); }
+.btn-success:hover { background: var(--green-light); color: white; }
+.btn-blue { background: var(--blue-light); color: var(--blue); }
+.btn-blue:hover { background: var(--blue); color: white; }
+.btn-sm { padding: 6px 12px; font-size: 12px; }
+
+/* ── SUCCESS ── */
+.success-screen { display: none; text-align: center; padding: 32px 20px; }
+.success-icon {
+  width: 72px; height: 72px;
+  background: linear-gradient(135deg, var(--green-light), var(--green-mid));
+  border-radius: 50%; display: flex; align-items: center; justify-content: center;
+  margin: 0 auto 16px; font-size: 32px; color: white;
+  box-shadow: 0 8px 24px rgba(76,175,80,0.3);
+  animation: popIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+@keyframes popIn { 0%{transform:scale(0);opacity:0} 100%{transform:scale(1);opacity:1} }
+.success-title { font-family:'Noto Serif Thai',serif; font-size:20px; font-weight:700; color:var(--green-dark); margin-bottom:8px; }
+.success-detail { background:var(--green-pale); border-radius:12px; padding:14px; margin:16px 0; text-align:left; font-size:13px; line-height:2; }
+.success-detail strong { color: var(--green-dark); }
+
+/* ── INFO BOX ── */
+.info-box { background:var(--gold-light); border-left:4px solid var(--gold); border-radius:0 10px 10px 0; padding:11px 13px; font-size:13px; color:#5D4037; margin-bottom:16px; line-height:1.6; }
+
+/* ── LOADING ── */
+.loading { display:inline-block; width:15px; height:15px; border:2px solid rgba(255,255,255,0.4); border-top-color:white; border-radius:50%; animation:spin 0.7s linear infinite; }
+@keyframes spin { to{transform:rotate(360deg)} }
+
+/* ════════════════════════════════
+   ADMIN PAGE
+════════════════════════════════ */
+.admin-header {
+  background: linear-gradient(135deg, #0D47A1, #1565C0);
+  padding: 20px; display: flex; align-items: center; gap: 14px;
+}
+.admin-header h2 { color: white; font-size: 18px; font-weight: 700; }
+.admin-header p { color: rgba(255,255,255,0.75); font-size: 13px; }
+.back-btn {
+  background: rgba(255,255,255,0.15); border: 1px solid rgba(255,255,255,0.3);
+  color: white; padding: 8px 14px; border-radius: 8px; cursor: pointer;
+  font-family: 'Sarabun', sans-serif; font-size: 13px; white-space: nowrap;
+  transition: all 0.2s;
+}
+.back-btn:hover { background: rgba(255,255,255,0.25); }
+
+.admin-container { max-width: 900px; margin: 0 auto; padding: 20px 16px 48px; }
+
+/* Admin Tabs */
+.tabs { display: flex; gap: 4px; margin-bottom: 20px; background: white; padding: 6px; border-radius: 12px; box-shadow: var(--shadow); }
+.tab {
+  flex: 1; padding: 10px; text-align: center; border-radius: 8px;
+  cursor: pointer; font-size: 14px; font-weight: 600; transition: all 0.2s;
+  color: var(--text-light); border: none; background: none; font-family: 'Sarabun', sans-serif;
+}
+.tab.active { background: var(--blue); color: white; box-shadow: 0 2px 8px rgba(21,101,192,0.3); }
+.tab-content { display: none; }
+.tab-content.active { display: block; }
+
+/* Slot Manager */
+.slot-list { display: grid; gap: 10px; margin-bottom: 16px; }
+.slot-admin-item {
+  background: white; border-radius: 12px; padding: 14px 16px;
+  display: flex; align-items: center; gap: 12px; box-shadow: var(--shadow);
+  border-left: 4px solid var(--green-light);
+}
+.slot-admin-item.taken-slot { border-left-color: var(--red); }
+.slot-admin-info { flex: 1; }
+.slot-admin-name { font-size: 14px; font-weight: 600; }
+.slot-admin-time { font-size: 12px; color: var(--text-light); margin-top: 2px; }
+.slot-admin-actions { display: flex; gap: 8px; align-items: center; }
+
+/* Add Slot Form */
+.add-slot-form {
+  background: white; border-radius: 14px; padding: 20px;
+  box-shadow: var(--shadow); margin-bottom: 16px;
+}
+.add-slot-form h3 { font-size: 15px; font-weight: 700; color: var(--blue); margin-bottom: 16px; }
+.form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 12px; }
+@media(max-width:480px){ .form-row { grid-template-columns: 1fr; } }
+.add-slot-form input, .add-slot-form select {
+  width: 100%; padding: 10px 12px; border: 1.5px solid #E0E0E0;
+  border-radius: 8px; font-family: 'Sarabun', sans-serif; font-size: 14px;
+  outline: none; transition: all 0.2s; appearance: none;
+}
+.add-slot-form input:focus { border-color: var(--blue); box-shadow: 0 0 0 3px rgba(21,101,192,0.1); }
+
+/* Registration Table */
+.reg-table-wrap { overflow-x: auto; border-radius: 12px; box-shadow: var(--shadow); }
+.reg-table {
+  width: 100%; border-collapse: collapse; background: white;
+  font-size: 13px; min-width: 700px;
+}
+.reg-table th {
+  background: var(--blue); color: white; padding: 12px 14px;
+  text-align: left; font-weight: 600; white-space: nowrap;
+}
+.reg-table th:first-child { border-radius: 12px 0 0 0; }
+.reg-table th:last-child { border-radius: 0 12px 0 0; }
+.reg-table td { padding: 11px 14px; border-bottom: 1px solid #F0F0F0; }
+.reg-table tr:last-child td { border-bottom: none; }
+.reg-table tr:hover td { background: #F8F9FA; }
+.reg-table tr:nth-child(even) td { background: #FAFAFA; }
+.reg-table tr:nth-child(even):hover td { background: #F0F4F0; }
+
+/* Empty state */
+.empty-state { text-align: center; padding: 40px 20px; color: var(--grey); }
+.empty-state .empty-icon { font-size: 40px; margin-bottom: 12px; }
+.empty-state p { font-size: 14px; }
+
+/* Stats */
+.stats-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 20px; }
+@media(max-width:480px){ .stats-row { grid-template-columns: 1fr 1fr; } }
+.stat-card { background: white; border-radius: 12px; padding: 16px; text-align: center; box-shadow: var(--shadow); }
+.stat-num { font-size: 28px; font-weight: 700; }
+.stat-label { font-size: 12px; color: var(--text-light); margin-top: 4px; }
+.stat-card.green .stat-num { color: var(--green-mid); }
+.stat-card.red .stat-num { color: var(--red); }
+.stat-card.blue .stat-num { color: var(--blue); }
+
+/* Password Modal */
+.modal-overlay {
+  position: fixed; inset: 0; background: rgba(0,0,0,0.5);
+  display: none; align-items: center; justify-content: center;
+  z-index: 1000; padding: 20px;
+}
+.modal {
+  background: white; border-radius: 16px; padding: 28px 24px;
+  max-width: 360px; width: 100%; box-shadow: 0 20px 60px rgba(0,0,0,0.2);
+}
+.modal h3 { font-size: 18px; font-weight: 700; color: var(--blue); margin-bottom: 8px; }
+.modal p { font-size: 13px; color: var(--text-light); margin-bottom: 16px; }
+.modal input {
+  width: 100%; padding: 12px; border: 1.5px solid #E0E0E0;
+  border-radius: 10px; font-size: 15px; font-family: 'Sarabun', sans-serif;
+  outline: none; margin-bottom: 12px;
+}
+.modal input:focus { border-color: var(--blue); }
+.modal-actions { display: flex; gap: 8px; }
+.modal-actions button { flex: 1; }
+
+/* Password change */
+.section-title { font-size: 15px; font-weight: 700; color: var(--blue); margin-bottom: 14px; display: flex; align-items: center; gap: 8px; }
+</style>
+</head>
+<body>
+
+<!-- ════════════════════════════════════════════
+     PAGE 1: Registration Form
+════════════════════════════════════════════ -->
+<div class="page active" id="page-form">
+  <div class="header">
+    <div class="header-badge">กรมส่งเสริมคุณภาพสิ่งแวดล้อม</div>
+    <h1>การนัดหมายการประเมินเมืองสิ่งแวดล้อมยั่งยืน<br>ระดับพื้นที่ ประจำปี 2569</h1>
+    <p>กรุณากรอกข้อมูลให้ครบถ้วน</p>
+    <button class="admin-btn" onclick="openAdmin()">⚙️ Admin</button>
+  </div>
+
+  <div class="container">
+    <form id="regForm">
+
+      <!-- องค์กร -->
+      <div class="card">
+        <div class="card-title"><div class="icon">🏛️</div>ข้อมูลองค์กรปกครองส่วนท้องถิ่น</div>
+        <div class="field" id="f-region">
+          <label>ภาค <span class="req">*</span></label>
+          <select id="region" required>
+            <option value="">-- กรุณาเลือกภาค --</option>
+            <option value="ภาคกลาง">ภาคกลาง</option>
+            <option value="ภาคเหนือ">ภาคเหนือ</option>
+            <option value="ภาคใต้">ภาคใต้</option>
+            <option value="ภาคตะวันออก">ภาคตะวันออก</option>
+            <option value="ภาคตะวันออกเฉียงเหนือ">ภาคตะวันออกเฉียงเหนือ</option>
+          </select>
+          <div class="err-msg">กรุณาเลือกภาค</div>
+        </div>
+        <div class="field" id="f-orgType">
+          <label>ประเภทองค์กรปกครองส่วนท้องถิ่น <span class="req">*</span></label>
+          <select id="orgType" required>
+            <option value="">-- กรุณาเลือก --</option>
+          </select>
+          <div class="err-msg">กรุณาเลือกประเภทองค์กร</div>
+        </div>
+        <div class="field" id="f-orgName">
+          <label>ชื่อองค์กรปกครองส่วนท้องถิ่น <span class="req">*</span></label>
+          <input type="text" id="orgName" placeholder="เช่น เทศบาลนครนนทบุรี" required>
+          <div class="err-msg">กรุณากรอกชื่อองค์กร</div>
+        </div>
+      </div>
+
+      <!-- ผู้ติดต่อ -->
+      <div class="card">
+        <div class="card-title"><div class="icon">👤</div>ข้อมูลผู้ติดต่อ</div>
+        <div class="field-row">
+          <div class="field" id="f-prefix">
+            <label>คำนำหน้า <span class="req">*</span></label>
+            <select id="prefix" required>
+              <option value="">-- เลือก --</option>
+            </select>
+            <div class="err-msg">กรุณาเลือก</div>
+          </div>
+          <div class="field" id="f-fullname">
+            <label>ชื่อ-นามสกุล <span class="req">*</span></label>
+            <input type="text" id="fullname" placeholder="ชื่อ นามสกุล" required>
+            <div class="err-msg">กรุณากรอกชื่อ-นามสกุล</div>
+          </div>
+        </div>
+        <div class="field" id="f-position" style="margin-top:14px">
+          <label>ตำแหน่ง <span class="req">*</span></label>
+          <input type="text" id="position" placeholder="เช่น นายกเทศมนตรี, ปลัดเทศบาล" required>
+          <div class="err-msg">กรุณากรอกตำแหน่ง</div>
+        </div>
+        <div class="field" id="f-phone">
+          <label>เบอร์โทรศัพท์ <span class="req">*</span></label>
+          <input type="tel" id="phone" placeholder="0XX-XXX-XXXX" required>
+          <div class="err-msg">กรุณากรอกเบอร์โทรศัพท์</div>
+        </div>
+        <div class="field">
+          <label>ID LINE</label>
+          <input type="text" id="lineId" placeholder="LINE ID (ถ้ามี)">
+        </div>
+        <div class="field" id="f-email">
+          <label>E-Mail <span class="req">*</span></label>
+          <input type="email" id="email" placeholder="example@email.com" required>
+          <div class="err-msg">กรุณากรอก E-Mail ให้ถูกต้อง</div>
+        </div>
+      </div>
+
+      <!-- Slot -->
+      <div class="card">
+        <div class="card-title"><div class="icon">📅</div>เลือกวันและเวลานัดหมาย</div>
+        <div class="info-box">💡 กรุณาเลือกภาคก่อน ระบบจะแสดงวันและเวลาของภาคนั้นเท่านั้น — ช่วงเวลาที่มีผู้จองแล้วจะไม่สามารถเลือกได้</div>
+        <div class="slot-grid" id="slotGrid"></div>
+        <div class="err-msg" id="slotError" style="margin-top:8px; font-size:13px;">กรุณาเลือกช่วงเวลานัดหมาย</div>
+      </div>
+
+      <button type="submit" class="btn btn-primary" id="submitBtn">ยืนยันการนัดหมาย</button>
+    </form>
+
+    <!-- Success -->
+    <div class="card success-screen" id="successScreen">
+      <div class="success-icon">✓</div>
+      <div class="success-title">ลงทะเบียนสำเร็จ!</div>
+      <p style="color:var(--text-light);font-size:14px;">ขอบคุณสำหรับการลงทะเบียน ทีมงานจะติดต่อกลับเพื่อยืนยัน</p>
+      <div class="success-detail" id="successDetail"></div>
+      <button class="btn btn-success" onclick="resetForm()" style="margin-top:8px">ลงทะเบียนอีกครั้ง</button>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════
+     PAGE 2: Admin
+════════════════════════════════════════════ -->
+<div class="page" id="page-admin">
+  <div class="admin-header">
+    <button class="back-btn" onclick="showPage('form')">← กลับ</button>
+    <div>
+      <h2>⚙️ หน้า Admin</h2>
+      <p>จัดการช่วงเวลานัดหมายและดูข้อมูลผู้ลงทะเบียน</p>
+    </div>
+  </div>
+
+  <div class="admin-container">
+    <!-- Tabs -->
+    <div class="tabs">
+      <button class="tab active" onclick="switchTab('slots')">📅 จัดการ Slot</button>
+      <button class="tab" onclick="switchTab('registrations')">📋 ผู้ลงทะเบียน</button>
+      <button class="tab" onclick="switchTab('settings')">🔧 ตั้งค่า</button>
+    </div>
+
+    <!-- Tab: Slots -->
+    <div class="tab-content active" id="tab-slots">
+      <!-- Add Slot Form -->
+      <div class="add-slot-form">
+        <h3>➕ เพิ่มช่วงเวลานัดหมายใหม่</h3>
+        <div class="form-row">
+          <div>
+            <label style="font-size:13px;font-weight:600;display:block;margin-bottom:6px;">ภาค</label>
+            <select id="newSlotRegion" style="width:100%;padding:10px 12px;border:1.5px solid #E0E0E0;border-radius:8px;font-family:'Sarabun',sans-serif;font-size:14px;outline:none;appearance:none;">
+              <option value="ภาคกลาง">ภาคกลาง</option>
+              <option value="ภาคเหนือ">ภาคเหนือ</option>
+              <option value="ภาคใต้">ภาคใต้</option>
+              <option value="ภาคตะวันออก">ภาคตะวันออก</option>
+              <option value="ภาคตะวันออกเฉียงเหนือ">ภาคตะวันออกเฉียงเหนือ</option>
+            </select>
+          </div>
+          <div>
+            <label style="font-size:13px;font-weight:600;display:block;margin-bottom:6px;">วันที่</label>
+            <input type="text" id="newSlotDate" placeholder="เช่น จันทร์ที่ 18 พ.ค. 69">
+          </div>
+          <div>
+            <label style="font-size:13px;font-weight:600;display:block;margin-bottom:6px;">ช่วงเวลา</label>
+            <select id="newSlotTime" style="width:100%;padding:10px 12px;border:1.5px solid #E0E0E0;border-radius:8px;font-family:'Sarabun',sans-serif;font-size:14px;outline:none;appearance:none;background-image:url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%231565C0' stroke-width='2' fill='none' stroke-linecap='round'/%3E%3C/svg%3E\");background-repeat:no-repeat;background-position:right 12px center;padding-right:34px;">
+              <option value="ช่วงเช้า 09.00 - 12.00 น.">ช่วงเช้า 09.00 - 12.00 น.</option>
+              <option value="ช่วงบ่าย 13.00 - 16.00 น.">ช่วงบ่าย 13.00 - 16.00 น.</option>
+            </select>
+          </div>
+        </div>
+        <button class="btn btn-blue" onclick="addSlot()">➕ เพิ่ม Slot</button>
+      </div>
+
+      <!-- Slot List -->
+      <div class="card">
+        <div class="card-title"><div class="icon">📅</div>รายการช่วงเวลานัดหมาย</div>
+        <div class="slot-list" id="adminSlotList"></div>
+      </div>
+    </div>
+
+    <!-- Tab: Registrations -->
+    <div class="tab-content" id="tab-registrations">
+      <div class="stats-row" id="statsRow"></div>
+      <div class="reg-table-wrap">
+        <table class="reg-table">
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>ภาค</th>
+              <th>ประเภทองค์กร</th>
+              <th>ชื่อองค์กร</th>
+              <th>ชื่อ-นามสกุล</th>
+              <th>ตำแหน่ง</th>
+              <th>เบอร์โทร</th>
+              <th>E-Mail</th>
+              <th>นัดหมาย</th>
+            </tr>
+          </thead>
+          <tbody id="regTableBody"></tbody>
+        </table>
+      </div>
+      <div style="margin-top:12px;text-align:right;">
+        <button class="btn btn-danger btn-sm" onclick="clearAllRegistrations()">🗑️ ล้างข้อมูลทั้งหมด</button>
+      </div>
+    </div>
+
+    <!-- Tab: Settings -->
+    <div class="tab-content" id="tab-settings">
+      <div class="card">
+        <div class="section-title">🔑 เปลี่ยนรหัสผ่าน Admin</div>
+        <div class="field">
+          <label>รหัสผ่านปัจจุบัน</label>
+          <input type="password" id="oldPass" placeholder="รหัสผ่านปัจจุบัน">
+        </div>
+        <div class="field">
+          <label>รหัสผ่านใหม่</label>
+          <input type="password" id="newPass" placeholder="รหัสผ่านใหม่">
+        </div>
+        <div class="field">
+          <label>ยืนยันรหัสผ่านใหม่</label>
+          <input type="password" id="confirmPass" placeholder="ยืนยันรหัสผ่านใหม่">
+        </div>
+        <button class="btn btn-blue" onclick="changePassword()">💾 บันทึกรหัสผ่านใหม่</button>
+        <div id="passMsg" style="margin-top:10px;font-size:13px;"></div>
+      </div>
+
+      <div class="card">
+        <div class="section-title">🔗 เชื่อมต่อ Google Sheets</div>
+        <div class="field">
+          <label>Google Apps Script URL</label>
+          <input type="text" id="sheetUrl" placeholder="https://script.google.com/macros/s/..." style="font-size:13px;">
+        </div>
+        <button class="btn btn-blue" onclick="saveSheetUrl()">💾 บันทึก URL</button>
+        <div id="urlMsg" style="margin-top:10px;font-size:13px;"></div>
+        <div style="margin-top:14px;padding:12px;background:#E3F2FD;border-radius:10px;font-size:12px;color:#1565C0;line-height:1.8;">
+          <strong>📖 วิธีสร้าง Google Apps Script URL:</strong><br>
+          1. เปิด Google Sheets → เมนู Extensions → Apps Script<br>
+          2. วางโค้ดที่ให้ไว้ในไฟล์คู่มือ<br>
+          3. Deploy → New deployment → Web app<br>
+          4. Copy URL แล้วใส่ในช่องด้านบน
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="section-title">📝 จัดการตัวเลือก Dropdown</div>
+        <div class="field">
+          <label style="margin-bottom:8px;display:block;">ประเภทองค์กร (แต่ละบรรทัดคือ 1 ตัวเลือก)</label>
+          <textarea id="orgTypeOptions" rows="5" style="width:100%;padding:12px;border:1.5px solid #E0E0E0;border-radius:10px;font-family:'Sarabun',sans-serif;font-size:14px;outline:none;resize:vertical;"></textarea>
+        </div>
+        <button class="btn btn-blue" style="margin-bottom:16px;" onclick="saveOrgTypes()">💾 บันทึกตัวเลือก</button>
+        <div class="field">
+          <label style="margin-bottom:8px;display:block;">คำนำหน้า (แต่ละบรรทัดคือ 1 ตัวเลือก)</label>
+          <textarea id="prefixOptions" rows="6" style="width:100%;padding:12px;border:1.5px solid #E0E0E0;border-radius:10px;font-family:'Sarabun',sans-serif;font-size:14px;outline:none;resize:vertical;"></textarea>
+        </div>
+        <button class="btn btn-blue" onclick="savePrefixes()">💾 บันทึกตัวเลือก</button>
+        <div id="optionsMsg" style="margin-top:10px;font-size:13px;"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Password Modal -->
+<div class="modal-overlay" id="adminModal">
+  <div class="modal">
+    <h3>🔐 เข้าสู่ระบบ Admin</h3>
+    <p>กรุณากรอกรหัสผ่านเพื่อเข้าใช้งานหน้า Admin</p>
+    <input type="password" id="adminPassInput" placeholder="รหัสผ่าน" onkeydown="if(event.key==='Enter')checkAdminPass()">
+    <div id="modalError" style="color:var(--red);font-size:12px;margin-bottom:10px;display:none;">รหัสผ่านไม่ถูกต้อง</div>
+    <div class="modal-actions">
+      <button class="btn btn-danger" onclick="closeModal()">ยกเลิก</button>
+      <button class="btn btn-blue" onclick="checkAdminPass()">เข้าสู่ระบบ</button>
+    </div>
+  </div>
+</div>
+
+
+<script>
+// GOOGLE SHEETS DATABASE VERSION — 5 REGIONS
+const DB = {
+  get: (key, def) => { try { return JSON.parse(localStorage.getItem(key)) ?? def; } catch(e){ return def; } },
+  set: (key, val) => localStorage.setItem(key, JSON.stringify(val)),
+};
+
+let slotsCache = [];
+let registrationsCache = [];
+let selectedSlot = null;
+
+function initData() {
+  if (!localStorage.getItem('adminPass')) DB.set('adminPass', 'admin1234');
+  if (!localStorage.getItem('sheetUrl')) DB.set('sheetUrl', '');
+  if (!localStorage.getItem('orgTypes')) DB.set('orgTypes', ['เทศบาลนคร','เทศบาลเมือง','เทศบาลตำบล','องค์การบริหารส่วนตำบล']);
+  if (!localStorage.getItem('prefixes')) DB.set('prefixes', ['นาย','นาง','นางสาว','อื่นๆ (โปรดระบุ)','ไม่ระบุ']);
+}
+function getApiUrl() { return (DB.get('sheetUrl', '') || '').trim(); }
+
+function api(action, params = {}) {
+  return new Promise((resolve, reject) => {
+    const url = getApiUrl();
+    if (!url) return reject(new Error('ยังไม่ได้ตั้งค่า Google Apps Script URL ในหน้า Admin'));
+    const cbName = 'cb_' + Date.now() + '_' + Math.random().toString(36).slice(2);
+    const qs = new URLSearchParams({ action, callback: cbName, ...params });
+    const s = document.createElement('script');
+    window[cbName] = (data) => { delete window[cbName]; s.remove(); resolve(data); };
+    s.onerror = () => { delete window[cbName]; s.remove(); reject(new Error('เชื่อมต่อ Google Apps Script ไม่สำเร็จ')); };
+    s.src = url + '?' + qs.toString();
+    document.body.appendChild(s);
+  });
+}
+
+function showPage(page) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.getElementById('page-' + page).classList.add('active');
+  window.scrollTo(0,0);
+  if (page === 'admin') renderAdmin();
+}
+function switchTab(tab) {
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+  document.getElementById('tab-' + tab).classList.add('active');
+  event.target.classList.add('active');
+  if (tab === 'slots') renderAdminSlots();
+  if (tab === 'registrations') renderRegistrations();
+  if (tab === 'settings') renderSettings();
+}
+
+function openAdmin() {
+  document.getElementById('adminPassInput').value = '';
+  document.getElementById('modalError').style.display = 'none';
+  document.getElementById('adminModal').style.display = 'flex';
+  setTimeout(() => document.getElementById('adminPassInput').focus(), 100);
+}
+function closeModal() { document.getElementById('adminModal').style.display = 'none'; }
+function checkAdminPass() {
+  const input = document.getElementById('adminPassInput').value;
+  const correct = DB.get('adminPass', 'admin1234');
+  if (input === correct) { closeModal(); showPage('admin'); }
+  else {
+    document.getElementById('modalError').style.display = 'block';
+    document.getElementById('adminPassInput').value = '';
+  }
+}
+function changePassword() {
+  const old = document.getElementById('oldPass').value;
+  const newP = document.getElementById('newPass').value;
+  const conf = document.getElementById('confirmPass').value;
+  const msg = document.getElementById('passMsg');
+  const correct = DB.get('adminPass', 'admin1234');
+  if (old !== correct) { msg.innerHTML = '<span style="color:var(--red)">❌ รหัสผ่านปัจจุบันไม่ถูกต้อง</span>'; return; }
+  if (newP.length < 4) { msg.innerHTML = '<span style="color:var(--red)">❌ รหัสผ่านใหม่ต้องมีอย่างน้อย 4 ตัวอักษร</span>'; return; }
+  if (newP !== conf) { msg.innerHTML = '<span style="color:var(--red)">❌ รหัสผ่านใหม่ไม่ตรงกัน</span>'; return; }
+  DB.set('adminPass', newP);
+  msg.innerHTML = '<span style="color:var(--green-mid)">✅ เปลี่ยนรหัสผ่านสำเร็จ</span>';
+  document.getElementById('oldPass').value = '';
+  document.getElementById('newPass').value = '';
+  document.getElementById('confirmPass').value = '';
+}
+
+function populateDropdowns() {
+  const orgSel = document.getElementById('orgType');
+  const prefSel = document.getElementById('prefix');
+  orgSel.innerHTML = '<option value="">-- กรุณาเลือก --</option>';
+  DB.get('orgTypes', []).forEach(v => { const o = document.createElement('option'); o.value = v; o.textContent = v; orgSel.appendChild(o); });
+  prefSel.innerHTML = '<option value="">-- เลือก --</option>';
+  DB.get('prefixes', []).forEach(v => { const o = document.createElement('option'); o.value = v; o.textContent = v; prefSel.appendChild(o); });
+}
+
+async function loadSlots() {
+  const grid = document.getElementById('slotGrid');
+  if (!getApiUrl()) {
+    grid.innerHTML = '<div class="empty-state"><div class="empty-icon">🔗</div><p>ยังไม่ได้ตั้งค่า Google Apps Script URL<br>เข้า Admin → ตั้งค่า → ใส่ URL ก่อน</p></div>';
+    return;
+  }
+  grid.innerHTML = '<div class="empty-state"><div class="empty-icon">⏳</div><p>กำลังโหลดช่วงเวลาจาก Google Sheets...</p></div>';
+  try {
+    const res = await api('getSlots');
+    slotsCache = res.slots || [];
+    renderSlots();
+  } catch (err) {
+    grid.innerHTML = `<div class="empty-state"><div class="empty-icon">⚠️</div><p>${err.message}</p></div>`;
+  }
+}
+
+function renderSlots() {
+  const region = document.getElementById('region').value;
+  const grid = document.getElementById('slotGrid');
+  selectedSlot = null;
+  if (!region) {
+    grid.innerHTML = '<div class="empty-state"><div class="empty-icon">🗺️</div><p>กรุณาเลือกภาคก่อน</p></div>';
+    return;
+  }
+  const slots = slotsCache.filter(s => s.region === region);
+  if (slots.length === 0) {
+    grid.innerHTML = '<div class="empty-state"><div class="empty-icon">📅</div><p>ยังไม่มีช่วงเวลาของภาคนี้</p></div>';
+    return;
+  }
+  grid.innerHTML = '';
+  slots.forEach(slot => {
+    const taken = slot.taken || slot.status === 'จองแล้ว';
+    const div = document.createElement('div');
+    div.className = `slot-item${taken ? ' taken' : ''}`;
+    div.innerHTML = `
+      <div class="slot-radio"></div>
+      <div class="slot-info">
+        <div class="slot-name">📅 ${slot.date}</div>
+        <div class="slot-time">🕐 ${slot.time}</div>
+      </div>
+      <span class="slot-badge ${taken ? 'taken-badge' : 'available'}">${taken ? 'จองแล้ว' : 'ว่าง'}</span>`;
+    if (!taken) {
+      div.addEventListener('click', () => {
+        document.querySelectorAll('.slot-item').forEach(s => s.classList.remove('selected'));
+        div.classList.add('selected');
+        selectedSlot = slot;
+        document.getElementById('slotError').style.display = 'none';
+      });
+    }
+    grid.appendChild(div);
+  });
+}
+
+function validateInput(el) {
+  const field = el.closest('.field');
+  if (!field || !el.required) return true;
+  const val = el.value.trim();
+  let ok = !!val;
+  if (el.type === 'email' && val) ok = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(val);
+  field.classList.toggle('has-error', !ok);
+  if (ok) el.classList.remove('err'); else el.classList.add('err');
+  return ok;
+}
+
+document.querySelectorAll('#regForm input, #regForm select').forEach(el => {
+  el.addEventListener('blur', () => validateInput(el));
+  el.addEventListener('change', () => { if (el.closest('.field')?.classList.contains('has-error')) validateInput(el); });
+});
+document.getElementById('region').addEventListener('change', () => {
+  selectedSlot = null;
+  document.getElementById('slotError').style.display = 'none';
+  renderSlots();
+});
+
+document.getElementById('regForm').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  let ok = true;
+  document.querySelectorAll('#regForm input[required], #regForm select[required]').forEach(el => { if (!validateInput(el)) ok = false; });
+  if (!selectedSlot) { document.getElementById('slotError').style.display = 'block'; ok = false; }
+  if (!getApiUrl()) { alert('ยังไม่ได้ตั้งค่า Google Apps Script URL ในหน้า Admin'); ok = false; }
+  if (!ok) { document.querySelector('.has-error')?.scrollIntoView({behavior:'smooth',block:'center'}); return; }
+
+  const btn = document.getElementById('submitBtn');
+  btn.disabled = true;
+  btn.innerHTML = '<span class="loading"></span> กำลังบันทึก...';
+
+  const data = {
+    id: Date.now(),
+    region: document.getElementById('region').value,
+    orgType: document.getElementById('orgType').value,
+    orgName: document.getElementById('orgName').value,
+    prefix: document.getElementById('prefix').value,
+    fullname: document.getElementById('fullname').value,
+    position: document.getElementById('position').value,
+    phone: document.getElementById('phone').value,
+    lineId: document.getElementById('lineId').value || '-',
+    email: document.getElementById('email').value,
+    slotId: selectedSlot.id,
+    slotDate: selectedSlot.date,
+    slotTime: selectedSlot.time,
+    slot: `${selectedSlot.date} (${selectedSlot.time})`,
+    timestamp: new Date().toLocaleString('th-TH'),
+  };
+
+  try {
+    const res = await api('book', { payload: JSON.stringify(data) });
+    if (!res.success) {
+      alert(res.message || 'บันทึกไม่สำเร็จ');
+      await loadSlots();
+      btn.disabled = false;
+      btn.innerHTML = 'ยืนยันการนัดหมาย';
+      return;
+    }
+    document.getElementById('regForm').style.display = 'none';
+    document.getElementById('successScreen').style.display = 'block';
+    document.getElementById('successDetail').innerHTML = `
+      <strong>ภาค:</strong> ${data.region}<br>
+      <strong>ประเภทองค์กร:</strong> ${data.orgType}<br>
+      <strong>ชื่อองค์กร:</strong> ${data.orgName}<br>
+      <strong>ผู้ติดต่อ:</strong> ${data.prefix}${data.fullname}<br>
+      <strong>ตำแหน่ง:</strong> ${data.position}<br>
+      <strong>เบอร์โทร:</strong> ${data.phone}<br>
+      <strong>E-Mail:</strong> ${data.email}<br>
+      <strong>วันนัดหมาย:</strong> ${data.slot}`;
+    window.scrollTo({top:0,behavior:'smooth'});
+  } catch (err) {
+    alert(err.message);
+    btn.disabled = false;
+    btn.innerHTML = 'ยืนยันการนัดหมาย';
+  }
+});
+
+async function resetForm() {
+  document.getElementById('regForm').reset();
+  document.getElementById('regForm').style.display = 'block';
+  document.getElementById('successScreen').style.display = 'none';
+  selectedSlot = null;
+  document.getElementById('submitBtn').disabled = false;
+  document.getElementById('submitBtn').innerHTML = 'ยืนยันการนัดหมาย';
+  populateDropdowns();
+  await loadSlots();
+}
+
+async function renderAdmin() {
+  await loadAdminSlots();
+  await renderRegistrations();
+}
+async function loadAdminSlots() {
+  try {
+    const res = await api('getSlots');
+    slotsCache = res.slots || [];
+    renderAdminSlots();
+  } catch (err) {
+    document.getElementById('adminSlotList').innerHTML = `<div class="empty-state"><div class="empty-icon">⚠️</div><p>${err.message}</p></div>`;
+  }
+}
+function renderAdminSlots() {
+  const list = document.getElementById('adminSlotList');
+  if (!slotsCache.length) {
+    list.innerHTML = '<div class="empty-state"><div class="empty-icon">📅</div><p>ยังไม่มีช่วงเวลา หรือยังไม่ได้เชื่อม Google Sheets</p></div>';
+    return;
+  }
+  list.innerHTML = '';
+  slotsCache.forEach(slot => {
+    const taken = slot.taken || slot.status === 'จองแล้ว';
+    const div = document.createElement('div');
+    div.className = `slot-admin-item${taken ? ' taken-slot' : ''}`;
+    div.innerHTML = `
+      <div style="font-size:20px;">${taken ? '🔴' : '🟢'}</div>
+      <div class="slot-admin-info">
+        <div class="slot-admin-name">${slot.region} — ${slot.date}</div>
+        <div class="slot-admin-time">${slot.time} — ${taken ? '<span style="color:var(--red)">จองแล้ว</span>' : '<span style="color:var(--green-mid)">ว่าง</span>'}</div>
+      </div>
+      <div class="slot-admin-actions">
+        ${taken ? `<button class="btn btn-success btn-sm" onclick="resetSlot('${slot.id}')">🔓 เปิดใหม่</button>` : ''}
+        <button class="btn btn-danger btn-sm" onclick="deleteSlot('${slot.id}')">🗑️ ลบ</button>
+      </div>`;
+    list.appendChild(div);
+  });
+}
+async function addSlot() {
+  const region = document.getElementById('newSlotRegion').value;
+  const date = document.getElementById('newSlotDate').value.trim();
+  const time = document.getElementById('newSlotTime').value;
+  if (!date) { alert('กรุณากรอกวันที่'); return; }
+  try {
+    const res = await api('addSlot', { payload: JSON.stringify({ region, date, time }) });
+    if (!res.success) { alert(res.message || 'เพิ่มไม่สำเร็จ'); return; }
+    document.getElementById('newSlotDate').value = '';
+    await loadAdminSlots();
+    await loadSlots();
+    alert('✅ เพิ่มช่วงเวลาสำเร็จ');
+  } catch (err) { alert(err.message); }
+}
+async function deleteSlot(id) {
+  if (!confirm('ลบช่วงเวลานี้ใช่ไหมครับ?')) return;
+  try {
+    const res = await api('deleteSlot', { slotId: id });
+    if (!res.success) { alert(res.message || 'ลบไม่สำเร็จ'); return; }
+    await loadAdminSlots();
+    await loadSlots();
+  } catch (err) { alert(err.message); }
+}
+async function resetSlot(id) {
+  if (!confirm('เปิดช่วงเวลานี้ให้จองได้ใหม่ใช่ไหมครับ?')) return;
+  try {
+    const res = await api('resetSlot', { slotId: id });
+    if (!res.success) { alert(res.message || 'เปิดใหม่ไม่สำเร็จ'); return; }
+    await loadAdminSlots();
+    await loadSlots();
+  } catch (err) { alert(err.message); }
+}
+async function renderRegistrations() {
+  const tbody = document.getElementById('regTableBody');
+  try {
+    const res = await api('getRegistrations');
+    registrationsCache = res.registrations || [];
+  } catch (err) {
+    tbody.innerHTML = `<tr><td colspan="9" style="text-align:center;padding:32px;color:var(--red)">${err.message}</td></tr>`;
+    return;
+  }
+  const total = slotsCache.length;
+  const taken = slotsCache.filter(s => s.taken || s.status === 'จองแล้ว').length;
+  document.getElementById('statsRow').innerHTML = `
+    <div class="stat-card blue"><div class="stat-num">${registrationsCache.length}</div><div class="stat-label">ผู้ลงทะเบียนทั้งหมด</div></div>
+    <div class="stat-card red"><div class="stat-num">${taken}</div><div class="stat-label">Slot ที่จองแล้ว</div></div>
+    <div class="stat-card green"><div class="stat-num">${total - taken}</div><div class="stat-label">Slot ที่ว่าง</div></div>`;
+  if (registrationsCache.length === 0) {
+    tbody.innerHTML = '<tr><td colspan="9" style="text-align:center;padding:32px;color:var(--grey)">ยังไม่มีผู้ลงทะเบียน</td></tr>';
+    return;
+  }
+  tbody.innerHTML = '';
+  registrationsCache.forEach((r, i) => {
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td>${i+1}</td>
+      <td>${r.region || '-'}</td>
+      <td>${r.orgType || '-'}</td>
+      <td>${r.orgName || '-'}</td>
+      <td>${(r.prefix || '')}${r.fullname || '-'}</td>
+      <td>${r.position || '-'}</td>
+      <td>${r.phone || '-'}</td>
+      <td>${r.email || '-'}</td>
+      <td><span style="font-size:12px;background:var(--green-pale);color:var(--green-dark);padding:3px 8px;border-radius:8px;white-space:nowrap;">${r.slot || '-'}</span></td>`;
+    tbody.appendChild(tr);
+  });
+}
+function clearAllRegistrations() {
+  alert('เวอร์ชัน Google Sheets ไม่ล้างข้อมูลจากหน้าเว็บ เพื่อกันข้อมูลหาย ให้ลบ/สำรองใน Google Sheets โดยตรง');
+}
+
+function renderSettings() {
+  document.getElementById('orgTypeOptions').value = DB.get('orgTypes', []).join('\n');
+  document.getElementById('prefixOptions').value = DB.get('prefixes', []).join('\n');
+  document.getElementById('sheetUrl').value = DB.get('sheetUrl', '');
+}
+function saveOrgTypes() {
+  const vals = document.getElementById('orgTypeOptions').value.split('\n').map(v => v.trim()).filter(Boolean);
+  DB.set('orgTypes', vals);
+  populateDropdowns();
+  document.getElementById('optionsMsg').innerHTML = '<span style="color:var(--green-mid)">✅ บันทึกสำเร็จ</span>';
+  setTimeout(() => document.getElementById('optionsMsg').innerHTML = '', 2000);
+}
+function savePrefixes() {
+  const vals = document.getElementById('prefixOptions').value.split('\n').map(v => v.trim()).filter(Boolean);
+  DB.set('prefixes', vals);
+  populateDropdowns();
+  document.getElementById('optionsMsg').innerHTML = '<span style="color:var(--green-mid)">✅ บันทึกสำเร็จ</span>';
+  setTimeout(() => document.getElementById('optionsMsg').innerHTML = '', 2000);
+}
+async function saveSheetUrl() {
+  const url = document.getElementById('sheetUrl').value.trim();
+  DB.set('sheetUrl', url);
+  document.getElementById('urlMsg').innerHTML = '<span style="color:var(--green-mid)">✅ บันทึก URL สำเร็จ</span>';
+  await loadSlots();
+  setTimeout(() => document.getElementById('urlMsg').innerHTML = '', 2000);
+}
+
+initData();
+populateDropdowns();
+loadSlots();
+</script>
+
+</body>
+</html>
