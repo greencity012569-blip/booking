@@ -571,8 +571,9 @@ function initData() {
   if (!localStorage.getItem('orgTypes')) DB.set('orgTypes', ['เทศบาลนคร','เทศบาลเมือง','เทศบาลตำบล','องค์การบริหารส่วนตำบล']);
   if (!localStorage.getItem('prefixes')) DB.set('prefixes', ['นาย','นาง','นางสาว','อื่นๆ (โปรดระบุ)','ไม่ระบุ']);
 }
-function getApiUrl() { return (DB.get('sheetUrl', '') || '').trim(); }
-
+function getApiUrl() {
+  return 'https://script.google.com/macros/s/AKfycbyzjZ2BHjcCu0P0GIMVxsbW9VijChQkrK7R-qVAER5Bos5CRigX21_O8IS5anxpsDpXaw/exec';
+}
 function api(action, params = {}) {
   return new Promise((resolve, reject) => {
     const url = getApiUrl();
