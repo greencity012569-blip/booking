@@ -566,7 +566,8 @@ let selectedSlot = null;
 
 function initData() {
   if (!localStorage.getItem('adminPass')) DB.set('adminPass', 'admin1234');
-  if (!localStorage.getItem('sheetUrl')) DB.set('sheetUrl', '');
+  if (!localStorage.getItem('sheetUrl'))
+    DB.set('sheetUrl', 'https://script.google.com/macros/s/AKfycbyzjZ2BHjcCu0P0GIMVxsbW9VijChQkrK7R-qVAER5Bos5CRigX21_O8IS5anxpsDpXaw/exec');
   if (!localStorage.getItem('orgTypes')) DB.set('orgTypes', ['เทศบาลนคร','เทศบาลเมือง','เทศบาลตำบล','องค์การบริหารส่วนตำบล']);
   if (!localStorage.getItem('prefixes')) DB.set('prefixes', ['นาย','นาง','นางสาว','อื่นๆ (โปรดระบุ)','ไม่ระบุ']);
 }
